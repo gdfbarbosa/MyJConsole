@@ -16,12 +16,10 @@
 package io.github.albertopires.mjc;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -66,15 +64,6 @@ public class JConsoleM {
 		return serverConfiguration;
 	}
 	
-	private static ServerConfiguration obterConfiguracaoJboss(String host) {
-		ServerConfiguration serverConfiguration = new ServerConfiguration();
-		serverConfiguration.setHost(host);
-		serverConfiguration.setPort("7779");
-		serverConfiguration.setAuthenticate(Boolean.FALSE);
-		serverConfiguration.setJdkVersion(JdkVersion.JDK6);
-		return serverConfiguration;
-	}
-
 	public static void jvmLog(ServerConfiguration serverConfiguration) throws Exception {
 		JConsoleM jc;
 
@@ -132,6 +121,7 @@ public class JConsoleM {
 				System.err.println("InterruptedException : " + ex.getMessage());
 			}
 		}
+
 		return jc;
 	}
 
@@ -193,18 +183,16 @@ public class JConsoleM {
 		ObjectName mbeanName;
 		mbeanName = new ObjectName("java.lang:type=Memory");
 		CompositeDataSupport o;
-		o = (CompositeDataSupport) mbsc.getAttribute(mbeanName,
-				"HeapMemoryUsage");
+		o = (CompositeDataSupport) mbsc.getAttribute(mbeanName, "HeapMemoryUsage");
 		return ((Long) o.get("used")).longValue();
 	}
 
-	public long getNonHeapUsage() throws Exception {
+	public Long getNonHeapUsage() throws Exception {
 		ObjectName mbeanName;
 		mbeanName = new ObjectName("java.lang:type=Memory");
 		CompositeDataSupport o;
-		o = (CompositeDataSupport) mbsc.getAttribute(mbeanName,
-				"NonHeapMemoryUsage");
-		return ((Long) o.get("used")).longValue();
+		o = (CompositeDataSupport) mbsc.getAttribute(mbeanName, "NonHeapMemoryUsage");
+		return Long.valueOf(o.get("used").toString());
 	}
 
 	public int getThreadCount() throws Exception {
@@ -262,8 +250,7 @@ public class JConsoleM {
 	public final void getDeadLockedThreads(ServerConfiguration serverConfiguration) throws Exception {
 		ObjectName mbeanName;
 		mbeanName = new ObjectName("java.lang:type=Threading");
-		long[] dl = (long[]) mbsc.invoke(mbeanName, "findDeadlockedThreads",
-				null, null);
+		long[] dl = (long[]) mbsc.invoke(mbeanName, "findDeadlockedThreads", null, null);
 		StringBuilder sb;
 		if (dl != null) {
 			sb = new StringBuilder();
@@ -276,21 +263,6 @@ public class JConsoleM {
 		}
 	}
 
-	public String[] getRcptList(Properties conf) {
-		int i = 0;
-		String addr;
-		ArrayList<String> addrList = new ArrayList<String>();
-		while (true) {
-			addr = conf.getProperty("mail.rcpto." + i);
-			i++;
-			if (addr != null)
-				addrList.add(addr);
-			if (addr == null)
-				break;
-		}
-		return addrList.toArray(new String[0]);
-	}
-
 	public void showInfo() throws Exception {
 		String domains[] = mbsc.getDomains();
 		Arrays.sort(domains);
@@ -301,8 +273,7 @@ public class JConsoleM {
 		echo("\nMBean count = " + mbsc.getMBeanCount());
 
 		echo("\nQuery MBeanServer MBeans:");
-		Set<ObjectName> names = new TreeSet<ObjectName>(mbsc.queryNames(null,
-				null));
+		Set<ObjectName> names = new TreeSet<ObjectName>(mbsc.queryNames(null, null));
 		for (ObjectName name : names) {
 			echo("\tObjectName = " + name);
 		}
