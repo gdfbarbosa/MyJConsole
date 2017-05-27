@@ -52,10 +52,7 @@ public class JConsoleM {
 	public static void main(String[] args) throws Exception {
 		applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
 		
-		new Thread(new LogInvoker(obterConfiguracaoWildfly("172.31.29.20"))).start();
-//		new Thread(new LogInvoker(obterConfiguracaoWildfly("slave.movbr.com"))).start();
-//		new Thread(new LogInvoker(obterConfiguracaoJboss("master.movbr.com"))).start();
-//		new Thread(new LogInvoker(obterConfiguracaoJboss("slave.movbr.com"))).start();
+		new Thread(new LogInvoker(obterConfiguracaoWildfly(System.getProperty("jvm.host")))).start();
 	}
 
 	private static ServerConfiguration obterConfiguracaoWildfly(String host) {
